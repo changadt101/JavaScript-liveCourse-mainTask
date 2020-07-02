@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS直播班作業 - Week2</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <style>
+        .navbar-title {
+            font-family: 微軟正黑體;
+            font-weight: bold;
+            font-size: 30px;
+            margin-left: 15px;
+        }
+
+        .list-title {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .price {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <a class="navbar-brand navbar-title" href="#">汽車商城</a>
+    </nav>
+
+    <div class="container">
+        <h2 class="list-title">年度暢銷車款</h2>
+        <div id="productsList" class="card-columns">
+        </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        var obj = {
+            apiInfo: {
+                apiPath: 'https://course-ec-api.hexschool.io/',
+                uuid: '23ae3a1b-ed5e-4d05-89f5-1937834895dd'
+            },
+
+            apiResponse: {
+                myProducts: []
+            },
+
+            getProductsData: function() {
+                var vm = this,
+                    apiUrl = `${vm.apiInfo.apiPath}api/${vm.apiInfo.uuid}/ec/products`;
+
+                axios.get(apiUrl)
+                    .then(function(response) {
+                        vm.apiResponse.myProducts = response.data.data;
+                        vm.renderData();
+                    })
+            },
+
+            renderData: function() {
+                var vm = this,
+                    list = document.getElementById('productsList'),
+                    myProducts = vm.apiResponse.myProducts,
+                    myProductsView = '';
+
+                myProducts.forEach(function(product) {
+                    myProductsView += `
+                    <div class="card">
+                        <img src="${ product.imageUrl[0] }" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">${ product.title }</h5>
+                            <p class="card-text">${ product.content }</p>
+                            <p class="card-text">
+                                <span>建議售價 : </span>
+                                <span class="price">NT$ ${ product.price }</span>
+                            </p>
+                            <a href="#" class="btn btn-info">產品資訊</a>
+                        </div>
+                    </div>`;
+                });
+                list.innerHTML = myProductsView;
+            },
+        };
+
+        obj.getProductsData();
+    </script>
+</body>
+</html>
