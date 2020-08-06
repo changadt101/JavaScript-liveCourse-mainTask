@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <style>
+        html, body {
+            height: 100%;
+            text-align: center;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 390px;
+            padding: 15px;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <form class="login-form" @submit.prevent="signIn">
+                <h1 class="h3 mb-3 font-weight-bold">JS Week4 Homework Page</h1>
+                <p>請先輸入相關資訊並完成登入</p>
+
+                <div class="form-group">
+                    <label for="loginEmailColumn" class="sr-only">電子信箱</label>
+                    <input id="loginEmailColumn" v-model="user.email" type="email" class="form-control" placeholder="電子信箱" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPasswordColumn" class="sr-only">密碼</label>
+                    <input id="loginPasswordColumn" v-model="user.password" type="password" class="form-control" placeholder="密碼" required>
+                </div>
+
+                <button class="btn btn-lg btn-info btn-block font-weight-bold" type="submit">登入</button>
+
+                <p class="mt-5 mb-3 text-muted">&copy; 2020~∞ - FuChang</p>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <script>
+        const apiPath = 'https://course-ec-api.hexschool.io/api/';
+
+        new Vue({
+            el: '#app',
+            data: {
+                user: {
+                    email: '',
+                    password: '',
+                },
+            },
+            methods: {
+                signIn() {
+                    const apiUrl = `${apiPath}auth/login`;
+
+                    axios.post(apiUrl, this.user)
+                        .then((response) => {
+                            const token = response.data.token;
+                            const expired = response.data.expired;
+
+                            document.cookie = `token=${token};expires=${new Date(expired * 1000)}; path=/`;
+                        
+                            window.location = 'products.html';
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                        });
+                },
+            },
+        })
+    </script>
+</body>
+</html>
