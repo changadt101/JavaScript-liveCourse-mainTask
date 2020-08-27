@@ -1,131 +1,135 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW">
-
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>JS直播班作業 - Week1</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.css">
     <style>
-      .completed {
-        text-decoration: line-through
-      }
+        .completed {
+            text-decoration: line-through;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
+<body>
     <div id="app" class="container my-3">
-      <div class="input-group mb-3">
-        <div class="input-group-prepend">
-          <span class="input-group-text">待辦事項</span>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">待辦事項</span>
+            </div>
+
+            <input type="text" class="form-control" placeholder="準備要做的任務" id="inputTodoList">
+
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button" id="addTodoList">新增</button>
+            </div>
         </div>
-        <input type="text" class="form-control" placeholder="準備要做的任務" id="newTodo">
-        <div class="input-group-append">
-          <button class="btn btn-primary" type="button" id="addTodo">新增</button>
+
+        <div class="card text-center">
+            <ul class="list-group list-group-flush text-left" id="displayTodoList"></ul>
+
+            <div class="card-footer d-flex justify-content-between">
+                <span>還有 <span id="displayTodoListCount">0</span> 筆任務</span>
+
+                <a href="#" id="clearAllTodoList">清除所有任務</a>
+            </div>
         </div>
-      </div>
-      <div class="card text-center">
-        <ul class="list-group list-group-flush text-left" id="todoList">
-        </ul>
-        <div class="card-footer d-flex justify-content-between">
-          <span>還有 <span id="taskCount">0</span> 筆任務</span>
-          <a href="#" id="clearTask">清除所有任務</a>
-        </div>
-      </div>
     </div>
 
     <script>
-      var todoData = [];
+        var todoListInputText = document.getElementById('inputTodoList');
+        var addTodoListButton = document.getElementById('addTodoList');
+        var clearAllTodoListButton = document.getElementById('clearAllTodoList');
+        var todoListItems = document.getElementById('displayTodoList');
+        var todoListCount = document.getElementById('displayTodoListCount');
 
-      document.getElementById('addTodo').addEventListener('click', function () {
-        var str = '';
-        if (document.getElementById('newTodo').value.trim() !== '') {
-          todoData.push({
-            id: Math.floor(Date.now()),
-            title: document.getElementById('newTodo').value,
-            completed: false,
-          })
-          todoData.forEach(function (item) {
-            str += `<li class="list-group-item">
-<div class="d-flex">
-<div class="form-check">
-<input type="checkbox" class="form-check-input" ${item.completed ? 'checked' : ''} data-action="complete" data-id="${item.id}">
-<label class="form-check-label ${item.completed ? 'completed' : ''}" data-action="complete" data-id="${item.id}"> ${item.title}</label>
-</div>
-<button type="button" class="close ml-auto" aria-label="Close">
-<span aria-hidden="true" data-action="remove" data-id="${item.id}">&times;</span>
-</button>
-</div>
-</li>`;
-          })
-          document.getElementById('todoList').innerHTML = str;
-          document.getElementById('taskCount').textContent = todoData.length;
-          document.getElementById('newTodo').value = '';
-        }
-      });
-      document.getElementById('clearTask').addEventListener('click', function (e) {
-        e.preventDefault();
-        todoData = [];
-        document.getElementById('todoList').innerHTML = '';
-        document.getElementById('taskCount').textContent = todoData.length;
-      });
-      document.getElementById('todoList').addEventListener('click', function (e) {
-        var newIndex = 0;
-        if (e.target.dataset.action == 'remove') {
-          todoData.forEach(function (item, key) {
-            if (e.target.dataset.id == item.id) {
-              newIndex = key;
+        addTodoListButton.addEventListener('click', addTodoListItem);
+        clearAllTodoListButton.addEventListener('click', clearAllTodoListItems);
+        todoListItems.addEventListener('click', toggleClickEventAction);
+
+        var todoListData = [];
+        renderPage(todoListData);
+
+        function addTodoListItem() {
+            var newTodoListItem = todoListInputText.value.trim(),
+                timeStamp = Math.floor(Date.now());
+
+            if (newTodoListItem !== '') {
+                todoListData.push({
+                    id: timeStamp,
+                    title: newTodoListItem,
+                    completed: false,
+                });
+
+                renderPage(todoListData);
+
+                todoListInputText.value = '';
             }
-          })
-          todoData.splice(newIndex, 1);
-          var str = '';
-          todoData.forEach(function (item) {
-            str += `<li class="list-group-item">
-<div class="d-flex">
-<div class="form-check">
-<input type="checkbox" class="form-check-input" ${item.completed ? 'checked' : ''} data-action="complete" data-id="${item.id}">
-<label class="form-check-label ${item.completed ? 'completed' : ''}" data-action="complete" data-id="${item.id}"> ${item.title}</label>
-</div>
-<button type="button" class="close ml-auto" aria-label="Close">
-<span aria-hidden="true" data-action="remove" data-id="${item.id}">&times;</span>
-</button>
-</div>
-</li>`;
-          });
-          document.getElementById('todoList').innerHTML = str;
-          document.getElementById('taskCount').textContent = todoData.length;
         }
-      });
-      document.getElementById('todoList').addEventListener('click', function (e) {
-        if (e.target.dataset.action == 'complete') {
-          todoData.forEach(function (item) {
-            if (e.target.dataset.id == item.id) {
-              if (item.completed) {
-                item.completed = false;
-              } else {
-                item.completed = true;
-              }
+
+        function removeTodoListItem(id) {
+            var itemIndex = 0;
+
+            todoListData.forEach((item, key) => {
+                if (id == item.id) {
+                    itemIndex = key;
+                }
+            });
+
+            todoListData.splice(itemIndex, 1);
+
+            renderPage(todoListData);
+        }
+
+        function completeTodoListItem(id) {
+            todoListData.forEach((item) => {
+                if (id == item.id) {
+                    item.completed = item.completed ? false : true;
+                }
+            });
+
+            renderPage(todoListData);
+        }
+
+        function clearAllTodoListItems(e) {
+            e.preventDefault();
+            todoListData = [];
+            renderPage(todoListData);
+        }
+
+        function toggleClickEventAction(e) {
+            var action = e.target.parentNode.dataset.action,
+                id = e.target.parentNode.dataset.id;
+
+            if (action === 'remove') {
+                removeTodoListItem(id);
+            } else if (action === 'complete') {
+                completeTodoListItem(id);
             }
-          })
-          var str = '';
-          todoData.forEach(function (item) {
-            str += `<li class="list-group-item">
-<div class="d-flex">
-<div class="form-check">
-<input type="checkbox" class="form-check-input" ${item.completed ? 'checked' : ''} data-action="complete" data-id="${item.id}">
-<label class="form-check-label ${item.completed ? 'completed' : ''}" data-action="complete" data-id="${item.id}"> ${item.title}</label>
-</div>
-<button type="button" class="close ml-auto" aria-label="Close">
-<span aria-hidden="true" data-action="remove" data-id="${item.id}">&times;</span>
-</button>
-</div>
-</li>`;
-          })
-          document.getElementById('todoList').innerHTML = str;
-          document.getElementById('taskCount').textContent = todoData.length;
         }
-      });
+
+        function renderPage(data) {
+            var str = '';
+
+            data.forEach((item) => {
+                str += `<li class="list-group-item">
+                    <div class="d-flex">
+                        <div class="form-check" data-action="complete" data-id="${item.id}">
+                            <input type="checkbox" class="form-check-input" ${item.completed ? 'checked' : ''}>
+                            <label class="form-check-label ${item.completed ? 'completed' : ''}"> ${item.title}</label>
+                        </div>
+                        <button type="button" class="close ml-auto remove" aria-label="Close" data-action="remove" data-id="${item.id}">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </li>`;
+            });
+
+            todoListItems.innerHTML = str;
+
+            todoListCount.textContent = data.length;
+        }
     </script>
-  </body>
-
+</body>
 </html>
