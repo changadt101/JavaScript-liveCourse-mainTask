@@ -38,17 +38,17 @@
     </div>
 
     <script>
-        var todoListInputText = document.getElementById('inputTodoList');
-        var addTodoListButton = document.getElementById('addTodoList');
-        var clearAllTodoListButton = document.getElementById('clearAllTodoList');
-        var todoListItems = document.getElementById('displayTodoList');
-        var todoListCount = document.getElementById('displayTodoListCount');
+        var todoListInputText = document.getElementById('inputTodoList'),
+            addTodoListButton = document.getElementById('addTodoList'),
+            clearAllTodoListButton = document.getElementById('clearAllTodoList'),
+            todoListItems = document.getElementById('displayTodoList'),
+            todoListCount = document.getElementById('displayTodoListCount'),
+            todoListData = [];
 
         addTodoListButton.addEventListener('click', addTodoListItem);
         clearAllTodoListButton.addEventListener('click', clearAllTodoListItems);
         todoListItems.addEventListener('click', toggleClickEventAction);
 
-        var todoListData = [];
         renderPage(todoListData);
 
         function addTodoListItem() {
